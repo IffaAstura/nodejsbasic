@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const app = express();
 
+
+port = process.env.PORT || 8000;
 // Create connection
 require('dotenv/config')
 const conn = mysql.createConnection({
@@ -105,7 +107,7 @@ app.get("/ip", function (req, res) {
 });
 
 // Server listening
-app.listen(8000, () => {
+app.listen(port, () => {
   console.log('Server is running at port 8000');
   console.log('Your IP is', ip.address());
 });
