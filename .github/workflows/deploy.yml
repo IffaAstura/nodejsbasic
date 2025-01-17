@@ -3,7 +3,7 @@ name: Belajar CI/CD pipelinee
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build: 
