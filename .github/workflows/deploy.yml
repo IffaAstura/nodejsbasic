@@ -1,4 +1,4 @@
-name: Belajar CI/CD pipeline
+name: Belajar CI/CD pipelinee
 
 on:
   push:
