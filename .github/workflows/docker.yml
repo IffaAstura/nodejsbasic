@@ -65,7 +65,7 @@ jobs:
         {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-                "Name": "$ECR_REGISTRY/$ECR_REPOSITORY",
+                "Name": "$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG",
                 "Update": "true"
             },
             "Ports": [
