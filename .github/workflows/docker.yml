@@ -18,7 +18,7 @@ jobs:
     name: Build Image Productions
     runs-on: ubuntu-latest
     environment: Production
-    steps:
+    steps:    
     - name: Checkout
       uses: actions/checkout@v3
 
@@ -55,5 +55,57 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG
         echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NDOEJS_IMAGE_TAG"
 
+    - name: Create Dockerrun.aws.json
+      run: echo <<EOF > Dockerrun.aws.json
+            {
+                "AWSEBDockerrunVersion": "1",
+                "Image": {
+                    "Name": "$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG",
+                    "Update": "true"
+                },
+                "Ports": [
+                    {
+                        "ContainerPort": 8000,
+                        "HostPort": 80
+                    }
+                ]
+            }
+            EOF
+            
+    - name: Build zip
+      run: zip nodejsdocker.zip Dockerrun.aws.json
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: nodejsdocker
+        path: nodejsdocker.zip
+
     - name: End Build
       run: echo "Build Success"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: nodejsdocker
+    
+    - name: Deploy to Elastic Beanstalk
+      env:
+          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+          ZIP_FILE: "nodejsdocker.zip"
+      run: |
+        VERSION_LABEL="${{ github.sha }}-$(date +%s)"
+        aws elasticbeanstalk create-application-version \
+          --application-name ${{ secrets.EB_APP_NAME }} \
+          --version-label $VERSION_LABEL \
+          --source-bundle "fileb://$ZIP_FILE"
+        aws elasticbeanstalk update-environment \
+          --environment-name ${{ secrets.EB_ENV_NAME }} \
+          --version-label $VERSION_LABEL
+            
