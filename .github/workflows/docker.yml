@@ -53,7 +53,7 @@ jobs:
               
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG --build-arg aws_region=${{ env.AWS_REGION }} --build-arg copy_or_mount="copy" -f Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG
-        echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NDOEJS_IMAGE_TAG"
+        echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG"
 
     - name: Create Dockerrun.aws.json
       env:
