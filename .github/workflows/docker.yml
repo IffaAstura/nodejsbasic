@@ -82,11 +82,15 @@ jobs:
         name: nodejsdocker
         path: nodejsdocker.zip
 
+    - name: Upload to S3
+      run: |
+        aws s3 cp nodejsdocker.zip s3://${{ secrets.S3_BUCKET_NAME }}/nodejsdocker.zip
+
     - name: End Build
       run: echo "Build Success"
 
   deploy:
-    needs: build
+    needs: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -105,7 +109,7 @@ jobs:
         aws elasticbeanstalk create-application-version \
           --application-name ${{ secrets.EB_APP_NAME }} \
           --version-label $VERSION_LABEL \
-          --source-bundle "fileb://$ZIP_FILE"
+          --source-bundle S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=nodejsdocker.zip
         aws elasticbeanstalk update-environment \
           --environment-name ${{ secrets.EB_ENV_NAME }} \
           --version-label $VERSION_LABEL
