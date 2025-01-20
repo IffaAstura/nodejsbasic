@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Image Productions Nodejs
+    name: Build Image Productions Nodejss
     runs-on: ubuntu-latest
     environment: Production
     steps:    
