@@ -56,21 +56,22 @@ jobs:
         echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NDOEJS_IMAGE_TAG"
 
     - name: Create Dockerrun.aws.json
-      run: echo <<EOF > Dockerrun.aws.json
-            {
-                "AWSEBDockerrunVersion": "1",
-                "Image": {
-                    "Name": "$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG",
-                    "Update": "true"
-                },
-                "Ports": [
-                    {
-                        "ContainerPort": 8000,
-                        "HostPort": 80
-                    }
-                ]
-            }
-            EOF
+      run: |
+        echo <<EOF > Dockerrun.aws.json
+        {
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+                "Name": "$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG",
+                "Update": "true"
+            },
+            "Ports": [
+                {
+                    "ContainerPort": 8000,
+                    "HostPort": 80
+                }
+            ]
+        }
+        EOF
             
     - name: Build zip
       run: zip nodejsdocker.zip Dockerrun.aws.json
