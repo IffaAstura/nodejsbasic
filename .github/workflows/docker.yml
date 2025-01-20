@@ -1,0 +1,59 @@
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/docker.yml      
+      - "/**"
+
+env:
+  AWS_REGION: us-east-1                
+  ENV: "master"
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: Build Image Production
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login ecr
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build ECR Prod
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: lks-image-apps        
+        NODEJS_IMAGE_TAG: nodejs-${{ env.ENV }}-latest
+      run: |
+        docker --version
+        sudo apt update
+        sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt update
+        apt-cache policy docker-ce
+        sudo apt install docker-ce -y
+        docker --version
+              
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG --build-arg aws_region=${{ env.AWS_REGION }} --build-arg copy_or_mount="copy" -f Dockerfile .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG
+        echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NDOEJS_IMAGE_TAG"
+
+    - name: End Build
+      run: echo "Build Success"
