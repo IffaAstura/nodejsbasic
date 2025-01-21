@@ -1,4 +1,4 @@
-name: Docker Workflow Github
+name: Docker Workflow Githubb
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
       - master
     paths:
       - .github/workflows/docker.yml      
-      - "/**"      
+      - "/**"
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: us-east-1                
   ENV: "master"
 permissions:
   id-token: write
@@ -17,17 +17,17 @@ permissions:
 
 jobs:
   build:
-    name: Build image productions
+    name: Build Image Productions 
     runs-on: ubuntu-latest
     environment: Production
-    steps:
+    steps:    
     - name: Checkout
-      uses: action/checkout@v3
-   
-    - name: Configure aws credentials
-      uses: action/configure-aws-credentials@v1
-      with: 
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ env.AWS_REGION }}
@@ -36,7 +36,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build ecr prod
+    - name: Build ECR Prod
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -46,7 +46,7 @@ jobs:
         sudo apt update
         sudo apt install docker-ce -y
         docker --version
-
+              
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG --build-arg aws_region=${{ env.AWS_REGION }} --build-arg copy_or_mount="copy" -f Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG
         echo "::set-output name=nodejs_image::$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG"
@@ -98,16 +98,16 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: nodejsdocker
-
-    - name: Deploy to elastic beanstalk
+    
+    - name: Deploy to Elastic Beanstalk
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
-        EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
-        ZIP_FILE: "nodejsdocker.zip"
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}      
+          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+          ZIP_FILE: "nodejsdocker.zip"
       run: |
         VERSION_LABEL="${{ github.sha }}-$(date +%s)"
         aws elasticbeanstalk create-application-version \
@@ -116,4 +116,5 @@ jobs:
           --source-bundle S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=nodejsdocker.zip
         aws elasticbeanstalk update-environment \
           --environment-name ${{ secrets.EB_ENV_NAME }} \
-          --version-label $VERSION_LABEL        
+          --version-label $VERSION_LABEL
+            
