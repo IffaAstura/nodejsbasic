@@ -1,5 +1,3 @@
-name: Docker Workflow Githubb
-
 on:
   push:
     branches:
