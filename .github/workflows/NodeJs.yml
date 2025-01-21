@@ -1,4 +1,8 @@
+<<<<<<< HEAD:.github/workflows/deploy.yml
 name: Belajar CI/CD pipelinee
+=======
+name: Nodejs Workflow Github
+>>>>>>> 3239957c2a7710c8e1c8bbb3a261aeb176d98fa8:.github/workflows/NodeJs.yml
 
 on:
   push:
@@ -73,5 +77,9 @@ jobs:
           --source-bundle S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=nodejsbasic.zip
         aws elasticbeanstalk update-environment \
           --environment-name ${{ secrets.EB_ENV_NAME }} \
+<<<<<<< HEAD:.github/workflows/deploy.yml
           --version-label $VERSION_LABEL
       
+=======
+          --version-label $VERSION_LABEL
+>>>>>>> 3239957c2a7710c8e1c8bbb3a261aeb176d98fa8:.github/workflows/NodeJs.yml
