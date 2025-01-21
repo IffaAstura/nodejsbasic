@@ -19,7 +19,7 @@ jobs:
   build:
     name: Build image productions
     runs-on: ubuntu-latest
-    environtment: Production
+    environment: Production
     steps:
     - name: Checkout
       uses: action/checkout@v3
@@ -39,9 +39,9 @@ jobs:
     - name: Build ecr prod
       id: build-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registery }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: nodejs-images
-        NODEJS_IMAGE_TAG: nodejs-$ {{ env.ENV }}-latest
+        NODEJS_IMAGE_TAG: nodejs-${{ env.ENV }}-latest
       run: |
         sudo apt update
         sudo apt install docker-ce -y
@@ -53,15 +53,15 @@ jobs:
 
     - name: Create Dockerrun.aws.json
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registery }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: nodejs-images
-        NODEJS_IMAGE_TAG: nodejs-$ {{ env.ENV }}-latest   
+        NODEJS_IMAGE_TAG: nodejs-${{ env.ENV }}-latest   
       run: |
         cat <<EOF > Dockerrun.aws.json       
         {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-                "Name": "145359812414.dkr.ecr.us-east-1.amazonaws.com/nodejs-images:latest",
+                "Name": "$ECR_REGISTRY/$ECR_REPOSITORY:$NODEJS_IMAGE_TAG",
                 "Update": "true"
             },
             "Ports": [
