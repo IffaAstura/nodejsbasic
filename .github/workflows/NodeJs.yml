@@ -1,4 +1,4 @@
-name: Nodejs Workflow
+name: Nodejs Workflow Github
 
 on:
   push:
