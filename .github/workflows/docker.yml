@@ -94,7 +94,7 @@ jobs:
       run: echo "Build Success"
 
   deploy:
-    needs: Build
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
