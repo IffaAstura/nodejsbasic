@@ -1,8 +1,4 @@
-<<<<<<< HEAD:.github/workflows/deploy.yml
-name: Belajar CI/CD pipelinee
-=======
 name: Nodejs Workflow Github
->>>>>>> 3239957c2a7710c8e1c8bbb3a261aeb176d98fa8:.github/workflows/NodeJs.yml
 
 on:
   push:
